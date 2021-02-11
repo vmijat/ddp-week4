@@ -1,0 +1,77 @@
+---
+title: "K-means Clustering Example"
+author: "Vladimir Mijatovic"
+date: "2/11/2021"
+output:
+  ioslides_presentation:
+    self_contained: false
+    lib_dir: libs
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## k-means clustering
+
+This is a demonstration of k-means clustering.  
+
+k-means algorithm will cluster data into ***k*** clusters.  
+
+
+
+## client (ui.R)
+
+- input the desired number of clusters ***k*** via slider
+- clusterization into ***k*** clusters is done on the server side
+- visualization of ***k*** clusters is shown
+
+
+
+## Showing how it works
+
+```{r echo = FALSE} 
+library(cluster)
+data(iris)
+        inputPanel(
+            sliderInput("clusters",
+                        "number of clusters:",
+                        min = 1,
+                        max = 5,
+                        value = 3,
+                        step = 1,
+                        ticks = FALSE)  # no need to see ticks, as we are using integers
+        )
+        
+renderPlot({
+        set.seed(1001)
+        df <- iris
+        # taking input from the client
+        # input is coming from the "clusters" slider
+        cluster_num <- input$clusters
+        
+        # calculate k-means values for given cluster number
+        irisCluster <- kmeans(df[,1:4], center=cluster_num, nstart=20)
+       
+        # Show a plot of clusterized values
+        clusplot(iris, irisCluster$cluster, color=T, shade=T, labels=0, lines=0)
+        
+    })
+
+```
+
+## And here is how original dataset (Iris) is clustered
+
+```{r echo = FALSE}
+library(ggplot2)
+renderPlot({
+        
+        df <- iris
+        
+        ggplot(df, aes(Petal.Length, Petal.Width)) + 
+            geom_point(aes(col = Species), size = 4)
+
+    })
+```
+
